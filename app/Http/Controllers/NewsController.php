@@ -20,7 +20,14 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $fields = $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+        ]);
+
+        $news = News::create($fields);
+
+        return ['news' => $news];
     }
 
     /**
@@ -34,7 +41,7 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update($request, News $news)
+    public function update(Request $request, News $news)
     {
         //
     }
