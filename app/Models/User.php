@@ -15,4 +15,9 @@ class User extends Model
         'username',
         'password',
     ];
+
+    public function news()
+    {
+        return $this->hasMany(News::class);
+    }
 }
