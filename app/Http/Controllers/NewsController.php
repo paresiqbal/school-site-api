@@ -35,7 +35,7 @@ class NewsController extends Controller
      */
     public function show(News $news)
     {
-        //
+        return ['news' => $news];
     }
 
     /**
