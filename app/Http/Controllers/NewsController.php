@@ -6,6 +6,7 @@ use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
 class NewsController extends Controller implements HasMiddleware
 {
@@ -51,6 +52,8 @@ class NewsController extends Controller implements HasMiddleware
      */
     public function update(Request $request, News $news)
     {
+        Gate::authorize('modified', $news);
+
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
@@ -66,6 +69,8 @@ class NewsController extends Controller implements HasMiddleware
      */
     public function destroy(News $news)
     {
+        Gate::authorize('modified', $news);
+
         $news->delete();
 
         return [
