@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
-use App\Http\Requests\StoreNewsRequest;
-use App\Http\Requests\UpdateNewsRequest;
+use Illuminate\Http\Request;
 
 class NewsController extends Controller
 {
@@ -13,13 +12,13 @@ class NewsController extends Controller
      */
     public function index()
     {
-        //
+        return News::all();
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreNewsRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -35,7 +34,7 @@ class NewsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateNewsRequest $request, News $news)
+    public function update($request, News $news)
     {
         //
     }
