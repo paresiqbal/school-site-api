@@ -25,7 +25,7 @@ class NewsController extends Controller
             'content' => 'required',
         ]);
 
-        $news = News::create($fields);
+        $news = $request->user()->news()->create($fields);
 
         return $news;
     }
