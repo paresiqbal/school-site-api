@@ -27,7 +27,7 @@ class NewsController extends Controller
 
         $news = News::create($fields);
 
-        return ['news' => $news];
+        return $news;
     }
 
     /**
@@ -35,7 +35,7 @@ class NewsController extends Controller
      */
     public function show(News $news)
     {
-        return ['news' => $news];
+        return $news;
     }
 
     /**
@@ -43,7 +43,14 @@ class NewsController extends Controller
      */
     public function update(Request $request, News $news)
     {
-        //
+        $fields = $request->validate([
+            'title' => 'required|max:255',
+            'content' => 'required',
+        ]);
+
+        $news->update($fields);
+
+        return $news;
     }
 
     /**
