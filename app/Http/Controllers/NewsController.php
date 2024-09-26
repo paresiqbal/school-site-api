@@ -36,8 +36,12 @@ class NewsController extends Controller implements HasMiddleware
 
         $news = $request->user()->news()->create($fields);
 
-        return $news;
+        return response()->json([
+            'message' => 'News created successfully',
+            'news' => $news,
+        ], 201);
     }
+
 
     /**
      * Display the specified resource.
