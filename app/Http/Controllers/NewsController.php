@@ -29,10 +29,18 @@ class NewsController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
+        // Validate fields, including the image
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('news_images', 'public');
+            $fields['image'] = $imagePath;
+        }
 
         $news = $request->user()->news()->create($fields);
 
@@ -41,6 +49,7 @@ class NewsController extends Controller implements HasMiddleware
             'news' => $news,
         ], 201);
     }
+
 
 
     /**
