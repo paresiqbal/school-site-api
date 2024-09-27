@@ -32,6 +32,7 @@ class NewsController extends Controller implements HasMiddleware
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('news_images', 'public');
+
             $fields['image'] = asset('storage/' . $imagePath);
         }
 
@@ -49,6 +50,7 @@ class NewsController extends Controller implements HasMiddleware
             ],
         ], 201);
     }
+
 
     public function show(News $news)
     {
