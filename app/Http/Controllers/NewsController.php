@@ -31,9 +31,9 @@ class NewsController extends Controller implements HasMiddleware
         ]);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('news_images', 'public');
-
-            $fields['image'] = asset('storage/' . $imagePath);
+            // Move the uploaded image to the public/news_images directory
+            $imagePath = $request->file('image')->move(public_path('news_images'), $request->file('image')->getClientOriginalName());
+            $fields['image'] = 'news_images/' . $request->file('image')->getClientOriginalName(); // Store the relative path
         }
 
         $news = $request->user()->news()->create($fields);
@@ -44,7 +44,7 @@ class NewsController extends Controller implements HasMiddleware
                 'id' => $news->id,
                 'title' => $news->title,
                 'content' => $news->content,
-                'image' => isset($fields['image']) ? $fields['image'] : null,
+                'image' => isset($fields['image']) ? asset($fields['image']) : null, // Use asset() to generate the full URL
                 'created_at' => $news->created_at,
                 'updated_at' => $news->updated_at,
             ],
