@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller implements HasMiddleware
 {
@@ -31,7 +32,7 @@ class NewsController extends Controller implements HasMiddleware
         ]);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->move(public_path('news_images'), $request->file('image')->getClientOriginalName());
+            $imagePath = $request->file('image')->storeAs('news_images', $request->file('image')->getClientOriginalName(), 'public');
             $fields['image'] = 'news_images/' . $request->file('image')->getClientOriginalName();
         }
 
@@ -50,7 +51,6 @@ class NewsController extends Controller implements HasMiddleware
         ], 201);
     }
 
-
     public function show(News $news)
     {
         return $news;
@@ -63,16 +63,28 @@ class NewsController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $news->update($fields);
 
-        return $news;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->storeAs('news_images', $request->file('image')->getClientOriginalName(), 'public');
+            $fields['image'] = 'news_images/' . $request->file('image')->getClientOriginalName();
+            $news->image = $fields['image'];
+            $news->save();
+        }
+
+        return response()->json($news, 200);
     }
 
     public function destroy(News $news)
     {
         Gate::authorize('modified', $news);
+
+        if ($news->image) {
+            Storage::disk('public')->delete($news->image);
+        }
 
         $news->delete();
 
