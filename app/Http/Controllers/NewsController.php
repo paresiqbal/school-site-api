@@ -83,21 +83,6 @@ class NewsController extends Controller implements HasMiddleware
         ]);
     }
 
-    public function deleteImage(News $news)
-    {
-        Gate::authorize('modified', $news);
-
-        if ($news->image && file_exists(public_path($news->image))) {
-            unlink(public_path($news->image));
-            $news->image = null;
-            $news->save();
-        }
-
-        return response()->json([
-            'message' => 'Image deleted successfully',
-        ]);
-    }
-
     public function destroy(News $news)
     {
         Gate::authorize('modified', $news);
