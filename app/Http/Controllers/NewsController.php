@@ -63,24 +63,11 @@ class NewsController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
-        if ($request->hasFile('image')) {
-            if ($news->image && file_exists(public_path($news->image))) {
-                unlink(public_path($news->image));
-            }
-
-            $imagePath = $request->file('image')->move(public_path('news_images'), $request->file('image')->getClientOriginalName());
-            $fields['image'] = 'news_images/' . $request->file('image')->getClientOriginalName();
-        }
 
         $news->update($fields);
 
-        return response()->json([
-            'message' => 'News updated successfully',
-            'news' => $news,
-        ]);
+        return $news;
     }
 
     public function destroy(News $news)
