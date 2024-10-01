@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class NewsController extends Controller implements HasMiddleware
 {
@@ -60,15 +61,36 @@ class NewsController extends Controller implements HasMiddleware
     {
         Gate::authorize('modified', $news);
 
+        // Validate the incoming request
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate the image file
         ]);
 
-        $news->update($fields);
+        // Update title and content
+        $news->update([
+            'title' => $fields['title'],
+            'content' => $fields['content'],
+        ]);
 
-        return $news;
+        // Handle file upload if an image is provided
+        if ($request->hasFile('image')) {
+            // Store the uploaded image
+            $path = $request->file('image')->store('news_images', 'public'); // Store in 'public/news_images'
+
+            // Optionally, delete the old image if needed
+            if ($news->image) {
+                Storage::disk('public')->delete($news->image);
+            }
+
+            // Update the news record with the new image path
+            $news->update(['image' => $path]);
+        }
+
+        return response()->json($news, 200); // Return updated news as JSON
     }
+
 
     public function destroy(News $news)
     {
