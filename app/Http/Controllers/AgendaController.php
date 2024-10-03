@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Agenda;
-use App\Http\Requests\StoreAgendaRequest;
-use App\Http\Requests\UpdateAgendaRequest;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
@@ -25,7 +24,7 @@ class AgendaController extends Controller implements HasMiddleware
     }
 
 
-    public function store(StoreAgendaRequest $request)
+    public function store(Request $request)
     {
         $fileds = $request->validated([
             'title' => 'required|max:255',
@@ -52,7 +51,7 @@ class AgendaController extends Controller implements HasMiddleware
         return response()->json($agenda);
     }
 
-    public function update(UpdateAgendaRequest $request, Agenda $agenda)
+    public function update(Request $request, Agenda $agenda)
     {
         Gate::authorize('modified', $agenda);
 
