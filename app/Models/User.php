@@ -16,12 +16,18 @@ class User extends Model
         'password',
     ];
 
+    /**
+     * Relationship to news
+     */
     public function news()
     {
         return $this->hasMany(News::class);
     }
 
-    public function agenda()
+    /**
+     * Relationship to agendas
+     */
+    public function agendas() // Pluralized to reflect the relationship
     {
         return $this->hasMany(Agenda::class);
     }

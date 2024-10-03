@@ -15,6 +15,9 @@ class Agenda extends Model
         'date',
     ];
 
+    /**
+     * Relationship to user
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
