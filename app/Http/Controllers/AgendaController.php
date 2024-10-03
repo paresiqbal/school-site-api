@@ -7,6 +7,7 @@ use App\Http\Requests\StoreAgendaRequest;
 use App\Http\Requests\UpdateAgendaRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
 class AgendaController extends Controller implements HasMiddleware
 {
@@ -53,14 +54,29 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function update(UpdateAgendaRequest $request, Agenda $agenda)
     {
-        $agenda->update($request->validated());
-        return response()->json($agenda);
+        Gate::authorize('modified', $agenda);
+
+        $fields = $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'date' => 'required|date',
+        ]);
+
+        $agenda->update($fields);
+
+        return response()->json([
+            'message' => 'Agenda updated successfully',
+            'data' => $agenda
+        ], 200);
     }
 
 
     public function destroy(Agenda $agenda)
     {
         $agenda->delete();
-        return response()->json(null, 204);
+
+        return [
+            'message' => 'News deleted',
+        ];
     }
 }
