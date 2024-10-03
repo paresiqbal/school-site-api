@@ -14,4 +14,9 @@ class Agenda extends Model
         'description',
         'date',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

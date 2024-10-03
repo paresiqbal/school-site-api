@@ -20,4 +20,9 @@ class User extends Model
     {
         return $this->hasMany(News::class);
     }
+
+    public function agenda()
+    {
+        return $this->hasMany(Agenda::class);
+    }
 }
