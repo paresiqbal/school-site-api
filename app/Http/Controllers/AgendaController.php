@@ -32,14 +32,19 @@ class AgendaController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
-            'date' => 'required|date_format:d-m-Y',
+            'start_date' => 'required|date_format:d-m-Y',
+            'end_date' => 'required|date_format:d-m-Y|after_or_equal:start_date',
         ]);
 
         Log::info('Validated data: ', $fields);
 
-        $fields['date'] = Carbon::createFromFormat('d-m-Y', $fields['date'])->format('Y-m-d');
+        $fields['start_date'] = Carbon::createFromFormat('d-m-Y', $fields['start_date'])->format('Y-m-d');
+        $fields['end_date'] = Carbon::createFromFormat('d-m-Y', $fields['end_date'])->format('Y-m-d');
 
-        Log::info('Converted date: ', ['date' => $fields['date']]);
+        Log::info('Converted dates: ', [
+            'start_date' => $fields['start_date'],
+            'end_date' => $fields['end_date']
+        ]);
 
         $agenda = $request->user()->agendas()->create($fields);
 
@@ -49,7 +54,8 @@ class AgendaController extends Controller implements HasMiddleware
                 'id' => $agenda->id,
                 'title' => $agenda->title,
                 'description' => $agenda->description,
-                'date' => $agenda->date,
+                'start_date' => $agenda->start_date,
+                'end_date' => $agenda->end_date,
             ],
         ], 201);
     }
@@ -66,8 +72,12 @@ class AgendaController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
-            'date' => 'required|date',
+            'start_date' => 'required|date_format:d-m-Y',
+            'end_date' => 'required|date_format:d-m-Y|after_or_equal:start_date',
         ]);
+
+        $fields['start_date'] = Carbon::createFromFormat('d-m-Y', $fields['start_date'])->format('Y-m-d');
+        $fields['end_date'] = Carbon::createFromFormat('d-m-Y', $fields['end_date'])->format('Y-m-d');
 
         $agenda->update($fields);
 
@@ -76,6 +86,7 @@ class AgendaController extends Controller implements HasMiddleware
             'data' => $agenda
         ], 200);
     }
+
 
     public function destroy(Agenda $agenda)
     {
