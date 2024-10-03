@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AgendaController extends Controller implements HasMiddleware
 {
@@ -25,11 +27,19 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
+        Log::info('Received data: ', $request->all());
+
         $fields = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
-            'date' => 'required|date',
+            'date' => 'required|date_format:d-m-Y',
         ]);
+
+        Log::info('Validated data: ', $fields);
+
+        $fields['date'] = Carbon::createFromFormat('d-m-Y', $fields['date'])->format('Y-m-d');
+
+        Log::info('Converted date: ', ['date' => $fields['date']]);
 
         $agenda = $request->user()->agendas()->create($fields);
 
