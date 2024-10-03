@@ -8,7 +8,6 @@ use Illuminate\Auth\Access\Response;
 
 class NewsPolicy
 {
-
     public function modified(User $user, News $news): Response
     {
         return $user->id === $news->user_id
