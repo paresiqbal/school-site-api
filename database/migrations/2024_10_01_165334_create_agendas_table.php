@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('agendas', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
-            $table->number('date');
+            $table->text('description');
+            $table->date('date');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
