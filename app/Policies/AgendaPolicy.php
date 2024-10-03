@@ -12,6 +12,6 @@ class AgendaPolicy
     {
         return $user->id === $agenda->user_id
             ? Response::allow()
-            : Response::deny('You do not own this news');
+            : Response::deny('You do not own this agenda.');
     }
 }

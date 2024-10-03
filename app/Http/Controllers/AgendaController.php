@@ -23,16 +23,15 @@ class AgendaController extends Controller implements HasMiddleware
         return response()->json($agendas);
     }
 
-
     public function store(Request $request)
     {
-        $fileds = $request->validated([
+        $fields = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required',
             'date' => 'required|date',
         ]);
 
-        $agenda = $request->user()->agendas()->create($fileds);
+        $agenda = $request->user()->agendas()->create($fields);
 
         return response()->json([
             'message' => 'Agenda created successfully',
@@ -44,7 +43,6 @@ class AgendaController extends Controller implements HasMiddleware
             ],
         ], 201);
     }
-
 
     public function show(Agenda $agenda)
     {
@@ -69,13 +67,14 @@ class AgendaController extends Controller implements HasMiddleware
         ], 200);
     }
 
-
     public function destroy(Agenda $agenda)
     {
+        Gate::authorize('modified', $agenda);
+
         $agenda->delete();
 
-        return [
-            'message' => 'News deleted',
-        ];
+        return response()->json([
+            'message' => 'Agenda deleted',
+        ]);
     }
 }
