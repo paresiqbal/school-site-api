@@ -19,7 +19,8 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function index()
     {
-        //
+        $agendas = Agenda::all();
+        return response()->json($agendas);
     }
 
 
