@@ -45,6 +45,7 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function destroy(Agenda $agenda)
     {
-        //
+        $agenda->delete();
+        return response()->json(null, 204);
     }
 }
