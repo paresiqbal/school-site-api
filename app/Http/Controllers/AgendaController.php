@@ -38,7 +38,8 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function update(UpdateAgendaRequest $request, Agenda $agenda)
     {
-        //
+        $agenda->update($request->validated());
+        return response()->json($agenda);
     }
 
 
