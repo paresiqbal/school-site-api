@@ -26,8 +26,23 @@ class AgendaController extends Controller implements HasMiddleware
 
     public function store(StoreAgendaRequest $request)
     {
-        $agenda = Agenda::create($request->validated());
-        return response()->json($agenda, 201);
+        $fileds = $request->validated([
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'date' => 'required|date',
+        ]);
+
+        $agenda = $request->user()->agendas()->create($fileds);
+
+        return response()->json([
+            'message' => 'Agenda created successfully',
+            'agenda' => [
+                'id' => $agenda->id,
+                'title' => $agenda->title,
+                'description' => $agenda->description,
+                'date' => $agenda->date,
+            ],
+        ], 201);
     }
 
 
