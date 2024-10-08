@@ -25,9 +25,17 @@ class User extends Model
     }
 
     /**
+     * Relationship to announcements
+     */
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class);
+    }
+
+    /**
      * Relationship to agendas
      */
-    public function agendas() // Pluralized to reflect the relationship
+    public function agendas()
     {
         return $this->hasMany(Agenda::class);
     }
