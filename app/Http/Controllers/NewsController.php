@@ -51,7 +51,6 @@ class NewsController extends Controller implements HasMiddleware
         ], 201);
     }
 
-
     public function show(News $news)
     {
         return $news;
@@ -87,7 +86,6 @@ class NewsController extends Controller implements HasMiddleware
 
         return response()->json($news, 200);
     }
-
 
     public function destroy(News $news)
     {
