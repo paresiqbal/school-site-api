@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Http\Request;
@@ -16,3 +17,4 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::apiResource('news', NewsController::class);
 Route::apiResource('agenda', AgendaController::class);
+Route::apiResource('announcement', AnnouncementController::class);
