@@ -36,7 +36,7 @@ class AnnouncementController extends Controller implements HasMiddleware
             $fields['image'] = 'announcement_images/' . $request->file('image')->getClientOriginalName();
         }
 
-        $announcement = $request->user()->announcement()->create($fields);
+        $announcement = $request->user()->announcements()->create($fields);
 
         return response()->json([
             'message' => 'Announcement created successfully',
