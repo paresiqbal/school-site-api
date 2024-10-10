@@ -31,9 +31,10 @@ class NewsController extends Controller implements HasMiddleware
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
+        // Store the image in the public disk and get the path
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->move(public_path('news_images'), $request->file('image')->getClientOriginalName());
-            $fields['image'] = 'news_images/' . $request->file('image')->getClientOriginalName();
+            $path = $request->file('image')->store('news_images', 'public');
+            $fields['image'] = $path;
         }
 
         $news = $request->user()->news()->create($fields);
