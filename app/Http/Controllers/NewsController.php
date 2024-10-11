@@ -33,7 +33,8 @@ class NewsController extends Controller implements HasMiddleware
 
         // Store the image in the public disk and get the path
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('news_images', 'public');
+            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
             $fields['image'] = $path;
         }
 
@@ -73,7 +74,8 @@ class NewsController extends Controller implements HasMiddleware
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('news_images', 'public');
+            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
 
             if ($news->image) {
                 Storage::disk('public')->delete($news->image);
@@ -88,14 +90,13 @@ class NewsController extends Controller implements HasMiddleware
     public function destroy(News $news)
     {
         Gate::authorize('modified', $news);
-        if ($news->image && file_exists(public_path($news->image))) {
-            unlink(public_path($news->image));
+
+        if ($news->image) {
+            Storage::disk('public')->delete($news->image);
         }
 
         $news->delete();
 
-        return [
-            'message' => 'News deleted',
-        ];
+        return response()->json(['message' => 'News and associated image deleted'], 200);
     }
 }
