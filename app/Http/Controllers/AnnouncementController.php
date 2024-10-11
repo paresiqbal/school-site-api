@@ -32,8 +32,9 @@ class AnnouncementController extends Controller implements HasMiddleware
         ]);
 
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->move(public_path('announcement_images'), $request->file('image')->getClientOriginalName());
-            $fields['image'] = 'announcement_images/' . $request->file('image')->getClientOriginalName();
+            $fileName = 'announcement_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('announcement_images', $fileName, 'public');
+            $fields['image'] = $path;
         }
 
         $announcement = $request->user()->announcements()->create($fields);
@@ -73,13 +74,13 @@ class AnnouncementController extends Controller implements HasMiddleware
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('announcement_images', 'public');
-
+            $fileName = 'announcement_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('announcement_images', $fileName, 'public');
+            $fields['image'] = $path;
 
             if ($announcement->image) {
                 Storage::disk('public')->delete($announcement->image);
             }
-
 
             $announcement->update(['image' => $path]);
         }
@@ -90,14 +91,13 @@ class AnnouncementController extends Controller implements HasMiddleware
     public function destroy(Announcement $announcement)
     {
         Gate::authorize('modified', $announcement);
-        if ($announcement->image && file_exists(public_path($announcement->image))) {
-            unlink(public_path($announcement->image));
+
+        if ($announcement->image) {
+            Storage::disk('public')->delete($announcement->image);
         }
 
         $announcement->delete();
 
-        return [
-            'message' => 'Announcement deleted',
-        ];
+        return response()->json(['message' => 'Announcement and associated image deleted'], 200);
     }
 }
