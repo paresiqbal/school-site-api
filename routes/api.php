@@ -18,5 +18,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::apiResource('news', NewsController::class)->except(['update']);
 Route::post('/news/{news}', [NewsController::class, 'update'])->middleware('auth:sanctum');
 
+Route::apiResource('announcement', AnnouncementController::class)->except(['update']);
+Route::post('/announcement/{announcement}', [AnnouncementController::class, 'update'])->middleware('auth:sanctum');
+
 Route::apiResource('agenda', AgendaController::class);
-Route::apiResource('announcement', AnnouncementController::class);
