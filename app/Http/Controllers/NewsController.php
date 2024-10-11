@@ -61,7 +61,6 @@ class NewsController extends Controller implements HasMiddleware
     {
         Gate::authorize('modified', $news);
 
-
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
@@ -76,11 +75,9 @@ class NewsController extends Controller implements HasMiddleware
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('news_images', 'public');
 
-
             if ($news->image) {
                 Storage::disk('public')->delete($news->image);
             }
-
 
             $news->update(['image' => $path]);
         }
