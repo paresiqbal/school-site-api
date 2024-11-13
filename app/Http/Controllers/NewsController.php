@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -29,10 +30,10 @@ class NewsController extends Controller implements HasMiddleware
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,name', // Ensure tags exist in the tags table
         ]);
 
-        // Store the image in the public disk and get the path
         if ($request->hasFile('image')) {
             $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
@@ -41,17 +42,15 @@ class NewsController extends Controller implements HasMiddleware
 
         $news = $request->user()->news()->create($fields);
 
+        if (!empty($fields['tags'])) {
+            $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
+            $news->tags()->attach($tagIds);
+        }
+
         return response()->json([
             'message' => 'News created successfully',
-            'news' => [
-                'id' => $news->id,
-                'title' => $news->title,
-                'content' => $news->content,
-                'image' => isset($fields['image']) ? asset($fields['image']) : null,
-                'uploader_name' => $request->user()->name,
-                'created_at' => $news->created_at,
-                'updated_at' => $news->updated_at,
-            ],
+            'news' => $news->load('tags'),
+            'uploader_name' => $request->user()->name,
         ], 201);
     }
 
@@ -68,27 +67,19 @@ class NewsController extends Controller implements HasMiddleware
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'tags' => 'nullable|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:tags,name',
         ]);
 
-        $news->update([
-            'title' => $fields['title'],
-            'content' => $fields['content'],
-        ]);
+        $news->update($fields);
 
-        if ($request->hasFile('image')) {
-            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
-
-            if ($news->image) {
-                Storage::disk('public')->delete($news->image);
-            }
-
-            $news->update(['image' => $path]);
+        if (!empty($fields['tags'])) {
+            $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
+            $news->tags()->sync($tagIds); // Update tags association
         }
 
         return response()->json([
-            'news' => $news,
+            'news' => $news->load('tags'),
             'uploader_name' => $news->user->name,
         ], 200);
     }
