@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 Route::apiResource('news', NewsController::class)->except(['update']);
 Route::post('/news/{news}', [NewsController::class, 'update'])->middleware('auth:sanctum');
+
+Route::apiResource('tag', TagController::class);
 
 Route::apiResource('announcement', AnnouncementController::class)->except(['update']);
 Route::post('/announcement/{announcement}', [AnnouncementController::class, 'update'])->middleware('auth:sanctum');
