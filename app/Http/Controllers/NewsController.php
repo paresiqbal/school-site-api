@@ -29,6 +29,7 @@ class NewsController extends Controller implements HasMiddleware
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'tags' => 'nullable|string',
         ]);
 
         // Store the image in the public disk and get the path
@@ -47,6 +48,7 @@ class NewsController extends Controller implements HasMiddleware
                 'title' => $news->title,
                 'content' => $news->content,
                 'image' => isset($fields['image']) ? asset($fields['image']) : null,
+                'uploader_name' => $request->user()->name,
                 'created_at' => $news->created_at,
                 'updated_at' => $news->updated_at,
             ],
@@ -66,6 +68,7 @@ class NewsController extends Controller implements HasMiddleware
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'tags' => 'nullable|string',
         ]);
 
         $news->update([
@@ -84,7 +87,10 @@ class NewsController extends Controller implements HasMiddleware
             $news->update(['image' => $path]);
         }
 
-        return response()->json($news, 200);
+        return response()->json([
+            'news' => $news,
+            'uploader_name' => $news->user->name,
+        ], 200);
     }
 
     public function destroy(News $news)

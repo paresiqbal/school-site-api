@@ -13,6 +13,7 @@ class Announcement extends Model
         'title',
         'content',
         'image',
+        'tags',
     ];
 
     public function user()
