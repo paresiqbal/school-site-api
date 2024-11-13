@@ -39,4 +39,12 @@ class User extends Model
     {
         return $this->hasMany(Agenda::class);
     }
+
+    /**
+     * Relationship to achievements
+     */
+    public function achievements()
+    {
+        return $this->hasMany(Achievement::class);
+    }
 }
