@@ -10,6 +10,9 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Facades\Log;
+
+
 class NewsController extends Controller implements HasMiddleware
 {
     public static function middleware(): array
@@ -56,6 +59,9 @@ class NewsController extends Controller implements HasMiddleware
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
             $news->tags()->attach($tagIds);
         }
+
+        Log::info("Content:", [$request->input('content')]);
+        Log::info("Image:", [$request->file('image')]);
 
         return response()->json([
             'message' => 'News created successfully',
