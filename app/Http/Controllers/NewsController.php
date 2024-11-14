@@ -66,22 +66,6 @@ class NewsController extends Controller implements HasMiddleware
         ], 201);
     }
 
-    public function uploadImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
-
-            return response()->json(['url' => asset('storage/' . $path)], 201);
-        }
-
-        return response()->json(['error' => 'Image upload failed'], 400);
-    }
-
     public function show(News $news)
     {
         return $news;
