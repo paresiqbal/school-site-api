@@ -26,12 +26,13 @@ class NewsController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
+
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,name', // Ensure tags exist in the tags table
+            'tags.*' => 'exists:tags,name',
         ]);
 
         if ($request->hasFile('image')) {
@@ -75,7 +76,7 @@ class NewsController extends Controller implements HasMiddleware
 
         if (!empty($fields['tags'])) {
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
-            $news->tags()->sync($tagIds); // Update tags association
+            $news->tags()->sync($tagIds);
         }
 
         return response()->json([
