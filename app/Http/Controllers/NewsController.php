@@ -29,7 +29,6 @@ class NewsController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
-        // Validate the incoming request
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
@@ -38,7 +37,6 @@ class NewsController extends Controller implements HasMiddleware
             'tags.*' => 'exists:tags,name',
         ]);
 
-        // Handle the image upload if an image file is provided
         if ($request->hasFile('image')) {
             $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
@@ -47,13 +45,11 @@ class NewsController extends Controller implements HasMiddleware
             $fields['image'] = null;
         }
 
-        // Create the news entry in the database, associating it with the current user
         $news = $request->user()->news()->create([
             'title' => $fields['title'],
             'content' => $fields['content'],
             'image' => $fields['image'],
         ]);
-
 
         if (!empty($fields['tags'])) {
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
@@ -68,6 +64,22 @@ class NewsController extends Controller implements HasMiddleware
             'news' => $news->load('tags'),
             'uploader_name' => $request->user()->name,
         ], 201);
+    }
+
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
+
+            return response()->json(['url' => asset('storage/' . $path)], 201);
+        }
+
+        return response()->json(['error' => 'Image upload failed'], 400);
     }
 
     public function show(News $news)
