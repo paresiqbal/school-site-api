@@ -26,7 +26,7 @@ class NewsController extends Controller implements HasMiddleware
 
     public function store(Request $request)
     {
-
+        // Validate the incoming request
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
@@ -35,13 +35,22 @@ class NewsController extends Controller implements HasMiddleware
             'tags.*' => 'exists:tags,name',
         ]);
 
+        // Handle the image upload if an image file is provided
         if ($request->hasFile('image')) {
             $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
             $fields['image'] = $path;
+        } else {
+            $fields['image'] = null;
         }
 
-        $news = $request->user()->news()->create($fields);
+        // Create the news entry in the database, associating it with the current user
+        $news = $request->user()->news()->create([
+            'title' => $fields['title'],
+            'content' => $fields['content'],
+            'image' => $fields['image'],
+        ]);
+
 
         if (!empty($fields['tags'])) {
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
