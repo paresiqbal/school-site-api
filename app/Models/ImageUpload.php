@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ImageUpload extends Model
 {
     use HasFactory;
+
+    public function imageable()
+    {
+        return $this->morphTo();
+    }
 }

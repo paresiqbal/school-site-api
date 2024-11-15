@@ -20,6 +20,11 @@ class News extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function images()
+    {
+        return $this->morphMany(ImageUpload::class, 'imageable');
+    }
+
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
