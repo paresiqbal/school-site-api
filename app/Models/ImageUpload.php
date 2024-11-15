@@ -10,6 +10,7 @@ class ImageUpload extends Model
     use HasFactory;
 
     protected $table = 'images';
+
     protected $fillable = [
         'image',
         'imageable_type',
