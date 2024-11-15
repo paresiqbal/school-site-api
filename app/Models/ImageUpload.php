@@ -9,6 +9,12 @@ class ImageUpload extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'image',
+        'imageable_type',
+        'imageable_id',
+    ];
+
     public function imageable()
     {
         return $this->morphTo();
