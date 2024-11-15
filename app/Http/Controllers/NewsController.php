@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ImageUpload;
 use App\Models\News;
 use App\Models\Tag;
 use Illuminate\Http\Request;
@@ -29,30 +30,30 @@ class NewsController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,name',
         ]);
 
-        if ($request->hasFile('image')) {
-            $fileName = 'news_' . uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('news_images', $fileName, 'public');
-            $fields['image'] = $path;
-        } else {
-            $fields['image'] = null;
-        }
-
         $news = $request->user()->news()->create([
             'title' => $fields['title'],
             'content' => $fields['content'],
-            'image' => $fields['image'],
         ]);
 
+        // Upload image if provided
+        if ($request->hasFile('image')) {
+            $imageController = new ImageUploadController();
+            $imageController->store($request);
+
+            // Link image to news
+            $image = ImageUpload::latest()->first();
+            $news->images()->save($image);
+        }
+
+        // Handle tags
         if (!empty($fields['tags'])) {
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
             $news->tags()->attach($tagIds);
         }
-
 
         return response()->json([
             'message' => 'News created successfully',

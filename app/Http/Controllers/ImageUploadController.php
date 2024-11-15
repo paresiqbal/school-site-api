@@ -21,7 +21,26 @@ class ImageUploadController extends Controller
      */
     public function store(StoreImageUploadRequest $request)
     {
-        //
+        $fields = $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'imageable_type' => 'required|string',
+            'imageable_id' => 'required|integer',
+        ]);
+
+        if ($request->hasFile('image')) {
+            $fileName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('images', $fileName, 'public');
+
+            $image = ImageUpload::create([
+                'imageable_type' => $fields['imageable_type'],
+                'imageable_id' => $fields['imageable_id'],
+                'path' => $path
+            ]);
+
+            return response()->json(['image' => $image], 201);
+        }
+
+        return response()->json(['error' => 'No image uploaded'], 400);
     }
 
     /**
