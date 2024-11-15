@@ -20,12 +20,13 @@ class ImageUploadController extends Controller
 
         if ($request->hasFile('image')) {
             $fileName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
+
             $path = $request->file('image')->storeAs('images', $fileName, 'public');
 
             $image = ImageUpload::create([
+                'path' => $path,
                 'imageable_type' => $fields['imageable_type'],
                 'imageable_id' => $fields['imageable_id'],
-                'path' => $path
             ]);
 
             return response()->json(['image' => $image], 201);
