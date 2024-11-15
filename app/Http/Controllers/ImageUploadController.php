@@ -13,7 +13,7 @@ class ImageUploadController extends Controller
     public function store(Request $request)
     {
         $fields = $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'imageable_type' => 'required|string',
             'imageable_id' => 'required|integer',
         ]);
