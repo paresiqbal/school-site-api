@@ -15,15 +15,13 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'image-upload'],
+    'paths' => ['api/*', 'image-upload'], // Ensure the right paths are set
 
-    'allowed_methods' => ['*'],
+    'allowed_methods' => ['*'],  // Allow all HTTP methods
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://localhost:3000'], // Your frontend URL
 
-    'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
+    'allowed_headers' => ['*'],  // Allow all headers
 
     'exposed_headers' => [],
 
