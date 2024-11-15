@@ -3,6 +3,7 @@
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\TagController;
 use Illuminate\Http\Request;
@@ -24,5 +25,7 @@ Route::apiResource('tag', TagController::class);
 
 Route::apiResource('announcement', AnnouncementController::class)->except(['update']);
 Route::post('/announcement/{announcement}', [AnnouncementController::class, 'update'])->middleware('auth:sanctum');
+
+Route::post('/image-upload', [ImageUploadController::class, 'store']);
 
 Route::apiResource('agenda', AgendaController::class);
