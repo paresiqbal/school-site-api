@@ -22,6 +22,7 @@ class ImageUploadController extends Controller
         if ($request->hasFile('image')) {
             $fileName = uniqid() . '.' . $request->file('image')->getClientOriginalExtension();
 
+            // Store image in public disk
             $path = $request->file('image')->storeAs('images', $fileName, 'public');
 
             // Log the data being passed to create()
@@ -37,7 +38,15 @@ class ImageUploadController extends Controller
                 'imageable_id' => $fields['imageable_id'],
             ]);
 
-            return response()->json(['image' => $image], 201);
+            // Return the full URL of the image
+            $imageUrl = asset('storage/' . $path);  // Generate the URL using asset()
+
+            return response()->json([
+                'image' => [
+                    'id' => $image->id,
+                    'url' => $imageUrl,
+                ]
+            ], 201);
         }
 
         return response()->json(['error' => 'No image uploaded'], 400);
