@@ -44,7 +44,6 @@ class NewsController extends Controller implements HasMiddleware
             $imageController = new ImageUploadController();
             $imageController->store($request);
 
-            // Link image to news
             $image = ImageUpload::latest()->first();
             $news->images()->save($image);
         }
