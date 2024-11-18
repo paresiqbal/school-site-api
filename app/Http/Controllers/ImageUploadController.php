@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ImageUpload;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ImageUploadController extends Controller
 {
@@ -24,13 +23,6 @@ class ImageUploadController extends Controller
 
             // Store image in public disk
             $path = $request->file('image')->storeAs('images', $fileName, 'public');
-
-            // Log the data being passed to create()
-            Log::info('Creating ImageUpload with data:', [
-                'path' => $path,
-                'imageable_type' => $fields['imageable_type'],
-                'imageable_id' => $fields['imageable_id'],
-            ]);
 
             $image = ImageUpload::create([
                 'path' => $path,
