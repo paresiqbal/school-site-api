@@ -39,7 +39,7 @@ class ImageUploadController extends Controller
             ]);
 
             // Return the full URL of the image
-            $imageUrl = asset('storage/' . $path);  // Generate the URL using asset()
+            $imageUrl = asset('storage/' . $path);
 
             return response()->json([
                 'image' => [
