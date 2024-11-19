@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
@@ -24,6 +25,9 @@ Route::apiResource('tag', TagController::class);
 
 Route::apiResource('announcement', AnnouncementController::class)->except(['update']);
 Route::post('/announcement/{announcement}', [AnnouncementController::class, 'update'])->middleware('auth:sanctum');
+
+Route::apiResource('achievements', AchievementController::class);
+Route::post('/achievements/{achievement}', [AchievementController::class, 'update'])->middleware('auth:sanctum');
 
 Route::post('/image-upload', [ImageUploadController::class, 'store']);
 
