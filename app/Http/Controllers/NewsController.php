@@ -32,6 +32,7 @@ class NewsController extends Controller implements HasMiddleware
             'content' => 'required',
             'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,name',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
         ]);
 
         $news = $request->user()->news()->create([
@@ -39,16 +40,15 @@ class NewsController extends Controller implements HasMiddleware
             'content' => $fields['content'],
         ]);
 
-        // Upload image if provided
         if ($request->hasFile('image')) {
             $imageController = new ImageUploadController();
-            $imageController->store($request);
-
-            $image = ImageUpload::latest()->first();
-            $news->images()->save($image);
+            $imageController->store(new Request([
+                'image' => $request->file('image'),
+                'imageable_type' => News::class,
+                'imageable_id' => $news->id,
+            ]));
         }
 
-        // Handle tags
         if (!empty($fields['tags'])) {
             $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
             $news->tags()->attach($tagIds);
@@ -56,7 +56,7 @@ class NewsController extends Controller implements HasMiddleware
 
         return response()->json([
             'message' => 'News created successfully',
-            'news' => $news->load('tags'),
+            'news' => $news->load('tags', 'images'),
             'uploader_name' => $request->user()->name,
         ], 201);
     }
