@@ -95,12 +95,16 @@ class NewsController extends Controller implements HasMiddleware
     {
         Gate::authorize('modified', $news);
 
-        if ($news->image) {
-            Storage::disk('public')->delete($news->image);
+        foreach ($news->images as $image) {
+            if (Storage::disk('public')->exists($image->path)) {
+                Storage::disk('public')->delete($image->path);
+            }
+
+            $image->delete();
         }
 
         $news->delete();
 
-        return response()->json(['message' => 'News and associated image deleted'], 200);
+        return response()->json(['message' => 'News and associated images deleted'], 200);
     }
 }
