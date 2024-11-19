@@ -12,7 +12,7 @@ class ImageUpload extends Model
     protected $table = 'images';
 
     protected $fillable = [
-        'image',
+        'path',
         'imageable_type',
         'imageable_id',
     ];
