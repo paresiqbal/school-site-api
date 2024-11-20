@@ -65,14 +65,13 @@ class NewsController extends Controller implements HasMiddleware
             'title' => 'required|max:255',
             'content' => 'required',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,name',
+
         ]);
 
         $news->update($fields);
 
         return response()->json([
-            'news' => $news->load('tags'),
+            'news' => $news,
             'uploader_name' => $news->user->name,
         ], 200);
     }

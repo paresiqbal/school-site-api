@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Announcement;
 use App\Models\Tag;
-use App\Http\Controllers\ImageUploadController;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class AnnouncementController extends Controller implements HasMiddleware
 {
@@ -27,7 +27,7 @@ class AnnouncementController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return Announcement::with(['user', 'tags', 'images'])->get();
+        return Announcement::with(['user', 'tags', 'images'])->paginate(10);
     }
 
     /**
@@ -53,12 +53,14 @@ class AnnouncementController extends Controller implements HasMiddleware
         // Handle image uploads if provided
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imageFile) {
-                $imageController = new ImageUploadController();
-                $imageController->store(new Request([
-                    'image' => $imageFile,
-                    'imageable_type' => Announcement::class,
-                    'imageable_id' => $announcement->id,
-                ]));
+                $imageFile->storePubliclyAs(
+                    'announcements',
+                    $imageFile->getClientOriginalName(),
+                    'public'
+                );
+                $announcement->images()->create([
+                    'path' => "announcements/{$imageFile->getClientOriginalName()}",
+                ]);
             }
         }
 
@@ -99,37 +101,26 @@ class AnnouncementController extends Controller implements HasMiddleware
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Update title and content
         $announcement->update([
             'title' => $fields['title'],
             'content' => $fields['content'],
         ]);
 
-        // Handle new image uploads if provided
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imageFile) {
-                $imageController = new ImageUploadController();
-                $imageController->store(new Request([
-                    'image' => $imageFile,
-                    'imageable_type' => Announcement::class,
-                    'imageable_id' => $announcement->id,
-                ]));
-            }
-        }
-
-        // Handle tags if provided
-        if (array_key_exists('tags', $fields)) {
-            if (!empty($fields['tags'])) {
-                $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
-                $announcement->tags()->sync($tagIds);
-            } else {
-                // If tags are provided but empty, detach all tags
-                $announcement->tags()->detach();
+                $imageFile->storePubliclyAs(
+                    'announcements',
+                    $imageFile->getClientOriginalName(),
+                    'public'
+                );
+                $announcement->images()->create([
+                    'path' => "announcements/{$imageFile->getClientOriginalName()}",
+                ]);
             }
         }
 
         return response()->json([
-            'announcement' => $announcement->load(['user', 'tags', 'images']),
+            'announcement' => $announcement->load(['user', 'images']),
             'uploader_name' => $announcement->user->name,
         ], 200);
     }
@@ -141,7 +132,13 @@ class AnnouncementController extends Controller implements HasMiddleware
     {
         Gate::authorize('modified', $announcement);
 
-        // The images and tag detach are handled in the model's boot method
+        foreach ($announcement->images as $image) {
+            if (Storage::disk('public')->exists($image->path)) {
+                Storage::disk('public')->delete($image->path);
+            }
+
+            $image->delete();
+        }
 
         $announcement->delete();
 
