@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ImageUpload;
 use App\Models\News;
-use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -30,8 +28,6 @@ class NewsController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,name',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:10240',
         ]);
 
@@ -49,14 +45,9 @@ class NewsController extends Controller implements HasMiddleware
             ]));
         }
 
-        if (!empty($fields['tags'])) {
-            $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
-            $news->tags()->attach($tagIds);
-        }
-
         return response()->json([
             'message' => 'News created successfully',
-            'news' => $news->load('tags', 'images'),
+            'news' => $news->load('images'),
             'uploader_name' => $request->user()->name,
         ], 201);
     }
@@ -79,11 +70,6 @@ class NewsController extends Controller implements HasMiddleware
         ]);
 
         $news->update($fields);
-
-        if (!empty($fields['tags'])) {
-            $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
-            $news->tags()->sync($tagIds);
-        }
 
         return response()->json([
             'news' => $news->load('tags'),
