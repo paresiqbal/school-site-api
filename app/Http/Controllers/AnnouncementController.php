@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Announcement;
-use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -27,7 +26,7 @@ class AnnouncementController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return Announcement::with(['user', 'tags', 'images'])->paginate(10);
+        return Announcement::with(['user', 'images'])->paginate(10);
     }
 
     /**
@@ -38,19 +37,15 @@ class AnnouncementController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,name',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Create the announcement
         $announcement = $request->user()->announcements()->create([
             'title' => $fields['title'],
             'content' => $fields['content'],
         ]);
 
-        // Handle image uploads if provided
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imageFile) {
                 $imageFile->storePubliclyAs(
@@ -64,15 +59,9 @@ class AnnouncementController extends Controller implements HasMiddleware
             }
         }
 
-        // Handle tags if provided
-        if (!empty($fields['tags'])) {
-            $tagIds = Tag::whereIn('name', $fields['tags'])->pluck('id');
-            $announcement->tags()->attach($tagIds);
-        }
-
         return response()->json([
             'message' => 'Announcement created successfully',
-            'announcement' => $announcement->load(['user', 'tags', 'images']),
+            'announcement' => $announcement->load(['user',  'images']),
             'uploader_name' => $request->user()->name,
         ], 201);
     }
@@ -82,7 +71,7 @@ class AnnouncementController extends Controller implements HasMiddleware
      */
     public function show(Announcement $announcement)
     {
-        return $announcement->load(['user', 'tags', 'images']);
+        return $announcement->load(['user',  'images']);
     }
 
     /**
@@ -95,8 +84,6 @@ class AnnouncementController extends Controller implements HasMiddleware
         $fields = $request->validate([
             'title' => 'required|max:255',
             'content' => 'required',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:tags,name',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
