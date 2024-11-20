@@ -13,6 +13,7 @@ class Announcement extends Model
     protected $fillable = [
         'title',
         'content',
+        'image',
     ];
 
     public function user()
@@ -30,24 +31,18 @@ class Announcement extends Model
         return $this->belongsToMany(Tag::class);
     }
 
-    /**
-     * Boot method to handle model events.
-     */
     protected static function boot()
     {
         parent::boot();
 
-        static::deleting(function ($announcement) {
-            // Delete associated images
-            foreach ($announcement->images as $image) {
+        static::deleting(function ($news) {
+            foreach ($news->images as $image) {
                 if (Storage::disk('public')->exists($image->path)) {
                     Storage::disk('public')->delete($image->path);
                 }
+
                 $image->delete();
             }
-
-            // Detach all tags
-            $announcement->tags()->detach();
         });
     }
 }

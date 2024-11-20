@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-
 class News extends Model
 {
     use HasFactory;
@@ -17,7 +16,6 @@ class News extends Model
         'image',
     ];
 
-    // relationships
     public function user()
     {
         return $this->belongsTo(User::class);
