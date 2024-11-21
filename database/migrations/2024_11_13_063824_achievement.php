@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->text('content');
-            $table->string('image')->nullable();
+            $table->longText('content');
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }

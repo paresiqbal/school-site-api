@@ -33,17 +33,15 @@ class Achievement extends Model
     {
         parent::boot();
 
-        static::deleting(function ($announcement) {
+        static::deleting(function ($achievement) {
             // Delete associated images
-            foreach ($announcement->images as $image) {
+            foreach ($achievement->images as $image) {
                 if (Storage::disk('public')->exists($image->path)) {
                     Storage::disk('public')->delete($image->path);
                 }
+
                 $image->delete();
             }
-
-            // Detach all tags
-            $announcement->tags()->detach();
         });
     }
 }
