@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Achievement;
-use App\Models\ImageUpload;
 use App\Http\Controllers\ImageUploadController;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;

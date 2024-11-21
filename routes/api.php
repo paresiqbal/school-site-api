@@ -26,8 +26,8 @@ Route::apiResource('tag', TagController::class);
 Route::apiResource('announcement', AnnouncementController::class)->except(['update']);
 Route::post('/announcement/{announcement}', [AnnouncementController::class, 'update'])->middleware('auth:sanctum');
 
-Route::apiResource('achievements', AchievementController::class);
-Route::post('/achievements/{achievement}', [AchievementController::class, 'update'])->middleware('auth:sanctum');
+Route::apiResource('achievement', AchievementController::class);
+Route::post('/achievement/{achievement}', [AchievementController::class, 'update'])->middleware('auth:sanctum');
 
 Route::post('/image-upload', [ImageUploadController::class, 'store']);
 
