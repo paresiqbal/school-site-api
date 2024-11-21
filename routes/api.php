@@ -4,6 +4,7 @@ use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ImageUploadController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\TagController;
@@ -32,3 +33,5 @@ Route::post('/achievement/{achievement}', [AchievementController::class, 'update
 Route::post('/image-upload', [ImageUploadController::class, 'store']);
 
 Route::apiResource('agenda', AgendaController::class);
+
+Route::apiResource('galleries', GalleryController::class);
